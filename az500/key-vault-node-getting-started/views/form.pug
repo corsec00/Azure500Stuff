@@ -1,0 +1,15 @@
+html
+html
+   head
+      title Form Tester
+   body
+      form(action = "/", method = "POST")
+         div
+            label(for = "keyVault") Key Vault Name:
+            input(name = "keyVault" value = "")
+         br
+         div
+            label(for = "secretName") Secret Name:
+            input(name = "secretName" value = "")
+         br
+         button(type = "submit") Get my secret!
