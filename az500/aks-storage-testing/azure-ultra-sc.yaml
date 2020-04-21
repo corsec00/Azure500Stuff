@@ -1,0 +1,11 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: managed-ultra
+provisioner: kubernetes.io/azure-disk
+parameters:
+  storageaccounttype: UltraSSD_LRS
+  kind: Managed
+  cachingMode: None
+  DiskIOPSReadWrite: "160000"
+  DiskMBpsReadWrite: "2000"

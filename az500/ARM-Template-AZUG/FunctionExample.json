@@ -1,0 +1,98 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+        "SeedName": {
+            "type": "string",
+            "defaultValue": "AzureRulez"
+        },
+        "LoopCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {},
+    "functions": [
+        {
+            "namespace": "azug",
+            "members": {
+                "uniqueNames": {
+                    "parameters": [
+                        {
+                            "name": "namePrefix",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "type": "string",
+                        "value": "[concat(parameters('namePrefix'), uniqueString(resourceGroup().id))]"
+                    }
+                },
+                "assignedArray":{
+                    "parameters": [
+                        {
+                            "name": "namePrefix",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "type": "array",
+                        "value": [
+                            "[concat(parameters('namePrefix'),'-disk1')]",
+                            "[concat(parameters('namePrefix'),'-disk2')]",
+                            "[concat(parameters('namePrefix'),'-disk3')]"
+                        ]
+                    }
+                },
+                "complexObject": {
+                    "parameters": [
+                        {
+                            "name": "namePrefix",
+                            "type": "string"
+                        },
+                        {
+                            "name": "networkAddress",
+                            "type": "string"
+                        },
+                        {
+                            "name": "projectID",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "type": "object",
+                        "value": {
+                            "name": "[parameters('namePrefix')]",
+                            "vnet": {
+                                "CIDR": "[parameters('networkAddress')]",
+                                "subnets": {
+                                    "subnet1": "10.0.1.0/24",
+                                    "subnet2": "10.0.2.0/24"
+                                },
+                                "tags": {
+                                    "type": "[concat(parameters('namePrefix'),'-development')]",
+                                    "project": "[concat(parameters('projectID'),'-id')]"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+	"resources": [],
+	"outputs": {
+		"uniqueNames": {
+			"value": "[azug.uniqueNames(parameters('SeedName'))]",
+			"type" : "string"
+        },
+        "assignedArray": {
+            "value": "[azug.assignedArray(parameters('SeedName'))]",
+            "type": "array"
+        },
+        "complexObject":{
+            "value": "[azug.complexObject(parameters('SeedName'),'10.0.0.0/16','8675309')]",
+            "type": "object"
+        }
+	}
+}

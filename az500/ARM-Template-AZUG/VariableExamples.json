@@ -1,0 +1,76 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "SeedName": {
+            "type": "string",
+            "defaultValue": "AzureRulez"
+        },
+        "LoopCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {
+        "BasicVariable": "[concat(parameters('SeedName'),'-MyBasicVariable')]",
+        "ComplexVariable": { 
+            "name": "[concat(parameters('SeedName'),'-MyComplexVariable')]",
+            "listItem": [
+                "One","Two","Three"
+            ]
+        },
+        "VariableWithCopy": {
+            "copy": [
+                {
+                    "name": "ArrayWithCopy",
+                    "count": "[parameters('LoopCount')]",
+                    "input": {
+                        "key1": "[concat(parameters('SeedName'),copyindex('ArrayWithCopy'))]",
+                        "key2": "[concat(parameters('SeedName'),add(copyindex('ArrayWithCopy'),1))]"
+                    }
+                }
+            ]
+        },
+        "copy": [
+            {
+                "name": "MultipleVariables",
+                "count": "[parameters('LoopCount')]",
+                "input": {
+                    "key1": "Arthur",
+                    "key2": "Zaphod",
+                    "list": [
+                        "[copyIndex('MultipleVariables',1)]",
+                        "[copyIndex('MultipleVariables',2)]",
+                        "[copyIndex('MultipleVariables',3)]"
+                    ]
+
+                }
+            }
+        ]
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "BasicVariable": {
+            "type": "string",
+            "value": "[variables('BasicVariable')]"
+        },
+        "ComplexVariable": {
+            "type": "object",
+            "value": "[variables('ComplexVariable')]"
+        },
+      "VariableWithCopy": {
+        "type": "object",
+        "value": "[variables('VariableWithCopy')]"
+      },
+      "MultipleVariables": {
+        "type": "array",
+        "value": "[variables('MultipleVariables')]"
+      },
+      "SingleVariableReference":{
+        "type": "object",
+        "value": "[variables('MultipleVariables')[1]]"
+      }
+
+    }
+  }

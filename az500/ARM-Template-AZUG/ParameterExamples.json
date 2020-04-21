@@ -1,0 +1,81 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"stringParam": {
+			"type" : "string",
+			"defaultValue": "option 1",
+			"allowedValues": [ "option 1", "option 2", "option 3" ],
+			"metadata" : { "description": "I'm a string!" }	
+		},
+		"derivedParam": {
+			"type" : "string",
+            "defaultValue": "[concat('derived ',resourceGroup().name)]",
+            "metadata" : { "description": "I'm derived!" }	
+        },
+        "intParam" : {
+            "type": "int",
+            "defaultValue": 1,
+            "allowedValues": [
+                1,3,5,7,9
+            ],
+            "metadata" : { "description": "I'm an int!" }	
+        },
+        "objectParam" : {
+            "type": "object",
+            "defaultValue": {
+                "name": "anObject",
+                "location": "Earth_I_think"
+            },
+            "metadata" : { "description": "I'm an onject!" }	
+        },
+        "arrayParam" : {
+            "type": "array",
+            "defaultValue": [
+                "Don't", "Panic", 42
+            ],
+            "metadata" : { "description": "I'm an array!" }	
+        },
+        "boolParam" : {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata" : { "description": "I'm a bool!" }	
+        },
+        "conditionalParam" : {
+            "type": "string",
+            "defaultValue": "[if(equals(parameters('intParam'),1),'yes','no')]"
+        }
+	},
+	"variables": {},
+	"resources": [],
+	"outputs": {
+		"stringParamOut": {
+			"value": "[parameters('stringParam')]",
+			"type" : "string"
+		},
+		"derivedParamOut": {
+			"value": "[parameters('derivedParam')]",
+			"type" : "string"
+        },
+        "intParamOut": {
+			"value": "[parameters('intParam')]",
+			"type" : "int"
+        },
+        "objectParamOut": {
+			"value": "[parameters('objectParam')]",
+			"type" : "object"
+        },
+        "arrayParamOut": {
+			"value": "[parameters('arrayParam')]",
+			"type" : "array"
+        },
+        "boolParamOut": {
+			"value": "[parameters('boolParam')]",
+			"type" : "bool"
+        },
+        "conditionalParamOut": {
+			"value": "[parameters('conditionalParam')]",
+			"type" : "string"
+        }
+	}
+}

@@ -1,0 +1,55 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dbench-pv-claim
+spec:
+  # storageClassName: azurefile
+  # storageClassName: azurefilepremium
+  # storageClassName: managed-standard-hdd
+  # storageClassName: managed-standard-ssd
+  storageClassName: managed-premium-ssd
+  # storageClassName: nfs-client
+  # storageClassName: managed-premium
+  # storageClassName: managed-ultra
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # storage: 1000Gi
+      # storage: 5120Gi
+      # storage: 10000Gi
+      storage: 20000Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dbench
+spec:
+  template:
+    spec:
+      nodeSelector:
+        agentpool: NODE_POOL_NAME
+      containers:
+      - name: dbench
+        image: ndrpnt/dbench:1.0.0
+        imagePullPolicy: Always
+        env:
+          - name: DBENCH_MOUNTPOINT
+            value: /data
+          - name: DBENCH_QUICK
+            value: "no"
+          - name: FIO_SIZE
+            value: 1G
+          - name: FIO_OFFSET_INCREMENT
+            value: 256M
+          - name: FIO_DIRECT
+            value: "1"
+        volumeMounts:
+        - name: dbench-pv
+          mountPath: /data
+      restartPolicy: Never
+      volumes:
+      - name: dbench-pv
+        persistentVolumeClaim:
+          claimName: dbench-pv-claim
+  backoffLimit: 4

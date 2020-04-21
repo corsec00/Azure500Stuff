@@ -1,0 +1,38 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+        "YourName": {
+            "type": "string",
+            "defaultValue": "Joe Bob",
+            "metadata": {
+                "description": "Person to greet"
+            }
+        }
+    },
+	"variables": {
+		"arrayA": [
+			1,
+			2
+		],
+		"arrayB": [
+			3,
+			4
+		]
+	},
+	"resources": [],
+	"outputs": {
+		"concatString": {
+			"value": "[concat('string','To','Concatenate')]",
+			"type": "string"
+		},
+		"concatArray": {
+			"value": "[concat(variables('arrayA'),variables('arrayB'))]",
+			"type": "array"
+        },
+        "concatHello": {
+            "value": "[concat('Hello ',parameters('YourName'), '!')]",
+            "type": "string"
+        }
+	}
+}

@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "UseNested": {
+            "type": "bool",
+            "defaultValue": true
+        }
+    },
+    "variables": {
+        "NoNestedArray" : [
+            "No Nested Array Used"
+        ]
+    },
+    "resources": [
+      {
+        "apiVersion": "2015-01-01",
+        "name": "nestedInlineTemplate",
+        "condition": "[parameters('UseNested')]",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "Incremental",
+          "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "resources":[],
+            "outputs": {
+              "example": {
+                "type": "array",
+                "copy": [
+                  {
+                    "name": "value",
+                    "count": 2,
+                    "input": {"innerValue": "[copyIndex('value')]"}
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outputs": {
+      "nestedDeployment": {
+        "type": "array",
+        "value": "[if(parameters('UseNested'),reference('nestedInlineTemplate').outputs.example.value, variables('NoNestedArray'))]"
+      }
+    }
+  }

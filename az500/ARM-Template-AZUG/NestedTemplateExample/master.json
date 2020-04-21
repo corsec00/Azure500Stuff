@@ -1,0 +1,190 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation":{
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+              },
+              "defaultValue": "https://raw.githubusercontent.com/ned1313/ARM-Template-AZUG/master/NestedTemplateExample"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+              },
+              "defaultValue": ""
+
+        },
+        "subnetRef": {
+            "type": "string",
+            "defaultValue": "null",
+            "metadata": {
+                "description": "The subnet on which to deploy the VM.  Leave null to create new Vnet"
+            }
+        },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "VNet1",
+            "metadata": {
+              "description": "VNet name"
+            }
+          },
+          "vnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+              "description": "Address prefix"
+            }
+          },
+          "subnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+              "description": "Subnet 1 Prefix"
+            }
+          },
+          "subnet1Name": {
+            "type": "string",
+            "defaultValue": "Subnet1",
+            "metadata": {
+              "description": "Subnet 1 Name"
+            }
+          },
+          "subnet2Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+              "description": "Subnet 2 Prefix"
+            }
+          },
+          "subnet2Name": {
+            "type": "string",
+            "defaultValue": "Subnet2",
+            "metadata": {
+              "description": "Subnet 2 Name"
+            }
+          },
+          "adminUsername": {
+            "type": "string",
+            "metadata": {
+              "description": "Username for the Virtual Machine."
+            }
+          },
+          "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+              "description": "Password for the Virtual Machine."
+            }
+          },
+          "dnsLabelPrefix": {
+            "type": "string",
+            "metadata": {
+              "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+            }
+          },
+          "windowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2016-Datacenter",
+            "allowedValues": [
+              "2008-R2-SP1",
+              "2012-Datacenter",
+              "2012-R2-Datacenter",
+              "2016-Nano-Server",
+              "2016-Datacenter-with-Containers",
+              "2016-Datacenter"
+            ],
+            "metadata": {
+              "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            }
+          },
+          "VMSize": {
+            "type": "string",
+            "allowedValues": [
+                "S","M","L"
+            ],
+            "defaultValue": "S",
+            "metadata": {
+                "description": "The VM Size for the deployment S=D2_v3, M=D4_v3, L=D8_v3"
+              }
+          },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+            "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": { },
+    "resources": [ 
+        {
+            "name": "vnetDeployment",
+            "condition": "[equals(parameters('subnetRef'), 'null')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "properties":{
+                "mode":"Incremental",
+                "templateLink":{
+                    "uri": "[concat(parameters('_artifactsLocation'), '/vnet.json', parameters('_artifactsLocationSasToken'))]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters":{
+                    "vnetName": {
+                        "value": "[parameters('vnetName')]"
+                    },
+                    "vnetAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+                    "subnet1Prefix": {
+                        "value": "[parameters('subnet1Prefix')]"
+                    },
+                    "subnet1Name": {
+                        "value": "[parameters('subnet1Name')]"
+                    },
+                    "subnet2Prefix": {
+                        "value": "[parameters('subnet2Prefix')]"
+                    },
+                    "subnet2Name": {
+                        "value": "[parameters('subnet2Name')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "vmDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "properties":{
+                "mode":"Incremental",
+                "templateLink":{
+                    "uri": "[concat(parameters('_artifactsLocation'), '/vm.json', parameters('_artifactsLocationSasToken'))]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters":{
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "dnsLabelPrefix": {
+                        "value": "[parameters('dnsLabelPrefix')]"
+                    },
+                    "windowsOSVersion": {
+                        "value": "[parameters('windowsOSVersion')]"
+                    },
+                    "subnet1Ref": {
+                        "value": "[if(equals(parameters('subnetRef'), 'null'),reference('vnetDeployment').outputs.subnet1Ref.value,parameters('subnetRef'))]"
+                    },
+                    "VMSize": {
+                        "value": "[parameters('VMSize')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

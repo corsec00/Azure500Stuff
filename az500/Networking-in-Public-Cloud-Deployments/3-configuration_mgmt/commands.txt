@@ -1,0 +1,6 @@
+terraform init
+terraform workspace new dev
+
+terraform validate
+terraform plan -out config.tfplan
+terraform apply "config.tfplan"
