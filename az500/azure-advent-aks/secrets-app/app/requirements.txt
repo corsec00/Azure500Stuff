@@ -1,0 +1,8 @@
+azure-keyvault==4.0.0
+azure-identity==1.0.1
+Flask==1.0.2
+Jinja2==2.10
+MarkupSafe==1.0
+Werkzeug==0.14.1
+Flask-WTF>=0.14
+WTForms==2.1

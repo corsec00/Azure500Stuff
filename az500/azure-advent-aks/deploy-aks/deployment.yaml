@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: demo
+    aadpodidbinding: advent-msi-example
+  name: demo
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: demo
+        aadpodidbinding: advent-msi-example
+    spec:
+      containers:
+      - name: demo
+        image: "mcr.microsoft.com/k8s/aad-pod-identity/demo:1.2"
+        imagePullPolicy: Always
+        args:
+          - "--subscriptionid=4d8e572a-3214-40e9-a26f-8f71ecd24e0d"
+          - "--clientid=6ca4ed01-e9a4-4ede-8f86-fbf368fa1405"
+          - "--resourcegroup=advent"
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      nodeSelector:
+        beta.kubernetes.io/os: linux
